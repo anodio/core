@@ -2,9 +2,6 @@
 
 namespace Bicycle\Core\Commands;
 
-use App\Config\DbConfig;
-use DI\Attribute\Inject;
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,8 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class HelloCommand extends Command
 {
-    #[Inject]
-    public DbConfig $dbConfig;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
