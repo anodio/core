@@ -4,10 +4,7 @@
     "psr-4": {
       "Bicycle\\Core\\": "src/",
       "App\\": "../../../../app/"
-    },
-    "files": [
-      "../../../vendor/attributes.php"
-    ]
+    }
   },
   "require": {
     "olvlvl/composer-attribute-collector": "v2.0.1",
