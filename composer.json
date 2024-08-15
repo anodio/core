@@ -6,7 +6,7 @@
       "App\\": "../../../../app/"
     },
     "files": [
-      "../../../../vendor/attributes.php"
+      "../../../vendor/attributes.php"
     ]
   },
   "require": {
