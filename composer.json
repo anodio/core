@@ -1,5 +1,5 @@
 {
-  "name": "bicycle/core",
+  "name": "anodio/core",
   "autoload": {
     "psr-4": {
       "Bicycle\\Core\\": "src/",
