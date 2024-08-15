@@ -23,7 +23,6 @@ class HelloCommand extends Command
         // return this if there was no problem running the command
         // (it's equivalent to returning int(0))
         $output->writeln('Hello, world!');
-        $output->writeln($this->dbConfig->host);
         return Command::SUCCESS;
 
         // or return this if some error happened during the execution
