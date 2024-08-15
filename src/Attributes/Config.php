@@ -4,34 +4,102 @@ namespace Bicycle\Core\Attributes;
 
 
 use Bicycle\Core\Abstraction\AbstractAttribute;
-use Bicycle\Core\AttributeInterfaces\ConfigInterface;
+use Bicycle\Core\AttributeInterfaces\AbstractConfig;
+use Bicycle\Core\Configuration\Env;
+use Bicycle\Core\Configuration\EnvRequired;
+use Bicycle\Core\Configuration\EnvRequiredNotEmpty;
+use DI\ContainerBuilder;
+use olvlvl\ComposerAttributeCollector\Attributes;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Config extends AbstractAttribute
 {
+    private ContainerBuilder $containerBuilder;
+    private bool $allowRedefine = false;
+
     public function __construct(public string $name)
     {
 
     }
 
+    public function setAllowRedefine(bool $allowRedefine): void
+    {
+        $this->allowRedefine = $allowRedefine;
+    }
+
+    public function setContainerBuilder(ContainerBuilder $containerBuilder): void
+    {
+        $this->containerBuilder = $containerBuilder;
+    }
+
     public function onClass(string $className): bool
     {
         $reflectionClass = new \ReflectionClass($className);
-        if (!$reflectionClass->hasMethod('load')) {
-            throw new \Exception('The class ' . $className . ' must implement Bicycle\\Core\\AttributeInterfaces\\ConfigInterface');
+        if (!$reflectionClass->isSubclassOf(AbstractConfig::class)) {
+            throw new \Exception('The class ' . $className . ' must extend Bicycle\\Core\\AttributeInterfaces\\AbstractConfig');
         }
-        if (!$reflectionClass->isReadOnly()) {
-            throw new \Exception('The class ' . $className . ' must be read-only');
+        if ($reflectionClass->getParentClass()->name!=AbstractConfig::class) {
+            //config redefines another one
+            $redefines = $reflectionClass->getParentClass()->name;
+        } else {
+            $redefines = null;
         }
-        /** @var ConfigInterface $exemplar */
-        $exemplar = call_user_func("$className::load");
-//        $this->container->setDefinition(
-//            'config.'.$this->name,
-//            new Definition($className)
-//        );
-//
-//        $this->container->set('config.'.$this->name, $exemplar);
-//        $this->container->set($className, $exemplar);
+
+        if ($redefines && !$this->allowRedefine) {
+            return false;
+        } elseif($redefines && $this->allowRedefine) {
+            $nameInContainer = $redefines;
+        } else {
+            $nameInContainer = $className;
+        }
+
+        $this->containerBuilder->addDefinitions([
+            $nameInContainer => \DI\factory(function (string $className, \Dotenv\Dotenv $dotenv) {
+
+                $data = [];
+                foreach (Attributes::findTargetProperties(Env::class) as $target) {
+                    if ($target->class!=$className) {
+                        continue;
+                    }
+                    if (!property_exists($className, $target->name)) {
+                        continue;
+                    }
+                    $data[$target->name] = $_ENV[$target->attribute->name] ?? $target->attribute->default;
+                }
+
+                foreach (Attributes::findTargetProperties(EnvRequired::class) as $target) {
+                    if ($target->class!=$className) {
+                        continue;
+                    }
+                    if (!property_exists($className, $target->name)) {
+                        continue;
+                    }
+                    $dotenv->required($target->attribute->name);
+                    $data[$target->name] = $_ENV[$target->attribute->name];
+                }
+
+                foreach (Attributes::findTargetProperties(EnvRequiredNotEmpty::class) as $target) {
+                    if ($target->class!=$className) {
+                        continue;
+                    }
+                    if (!property_exists($className, $target->name)) {
+                        continue;
+                    }
+                    if (is_null($_ENV[$target->attribute->name])) {
+                        throw new \Exception('The env field ' . $target->attribute->name . ' must be set');
+                    }
+                    $dotenv->required($target->attribute->name)->notEmpty();
+                    $data[$target->name] = $_ENV[$target->attribute->name];
+                }
+
+                return new $className($data);
+            })->parameter('className', $className)->parameter('dotenv', \DI\get(\Dotenv\Dotenv::class)),
+        ]);
+//        if ($redefines!==$className) {
+//            $this->containerBuilder->addDefinitions([
+//                $className => \DI\get($redefines),
+//            ]);
+//        }
         return true;
     }
 }
