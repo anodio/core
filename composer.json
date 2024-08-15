@@ -12,5 +12,13 @@
     "monolog/monolog": "^3.7",
     "symfony/console": "v7.1.3",
     "php-di/php-di": "^7.0"
+  },
+  "extra": {
+    "dev-kit": {
+      "git": {
+        "https": "https://github.com/anodio/core.git",
+        "ssh": "git@github.com:anodio/core.git"
+      }
+    }
   }
 }
