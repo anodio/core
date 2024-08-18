@@ -1,6 +1,6 @@
 <?php
 
-namespace src;
+namespace Anodio\Core;
 
 use DI\Container;
 use Swow\Coroutine;
