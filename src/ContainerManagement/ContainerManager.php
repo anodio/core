@@ -14,6 +14,11 @@ class ContainerManager
 {
     private static ContainerBuilder $builder;
     public static function createContainer(): Container {
+        if (!isset(static::$builder)) {
+            $containerManager = new ContainerManager();
+            $container = $containerManager->initContainer();
+            return $container;
+        }
         return static::$builder->build();
     }
 
