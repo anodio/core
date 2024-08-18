@@ -1,8 +1,8 @@
 <?php
 
-namespace Bicycle\Core\Attributes;
+namespace Anodio\Core\Attributes;
 
-use Bicycle\Core\Abstraction\AbstractAttribute;
+use Anodio\Core\Abstraction\AbstractAttribute;
 use DI\ContainerBuilder;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
@@ -27,8 +27,8 @@ class ExceptionTrap extends AbstractAttribute
     public function onClass(string $className): bool
     {
         $reflectionClass = new \ReflectionClass($className);
-        if (!$reflectionClass->isSubclassOf('Bicycle\Core\AttributeInterfaces\AbstractExceptionTrap')) {
-            throw new \Exception('The class ' . $className . ' must extend Bicycle\\Core\\AttributeInterfaces\\AbstractExceptionTrap');
+        if (!$reflectionClass->isSubclassOf('Anodio\Core\AttributeInterfaces\AbstractExceptionTrap')) {
+            throw new \Exception('The class ' . $className . ' must extend Anodio\\Core\\AttributeInterfaces\\AbstractExceptionTrap');
         }
         $this->containerBuilder->addDefinitions([
             $className => \DI\create($className)->constructor(\DI\get($this->loggerName))

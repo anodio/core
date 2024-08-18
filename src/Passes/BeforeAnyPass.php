@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\Core\Passes;
+namespace Anodio\Core\Passes;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

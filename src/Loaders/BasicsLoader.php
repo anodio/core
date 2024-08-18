@@ -1,10 +1,10 @@
 <?php
 
-namespace Bicycle\Core\Loaders;
+namespace Anodio\Core\Loaders;
 
-use Bicycle\Core\AttributeInterfaces\LoaderInterface;
-use Bicycle\Core\Attributes\Command;
-use Bicycle\Core\Attributes\Loader;
+use Anodio\Core\AttributeInterfaces\LoaderInterface;
+use Anodio\Core\Attributes\Command;
+use Anodio\Core\Attributes\Loader;
 use DI\ContainerBuilder;
 use olvlvl\ComposerAttributeCollector\Attributes;
 use Psr\Container\ContainerInterface;

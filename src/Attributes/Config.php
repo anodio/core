@@ -1,13 +1,13 @@
 <?php
 
-namespace Bicycle\Core\Attributes;
+namespace Anodio\Core\Attributes;
 
 
-use Bicycle\Core\Abstraction\AbstractAttribute;
-use Bicycle\Core\AttributeInterfaces\AbstractConfig;
-use Bicycle\Core\Configuration\Env;
-use Bicycle\Core\Configuration\EnvRequired;
-use Bicycle\Core\Configuration\EnvRequiredNotEmpty;
+use Anodio\Core\Abstraction\AbstractAttribute;
+use Anodio\Core\AttributeInterfaces\AbstractConfig;
+use Anodio\Core\Configuration\Env;
+use Anodio\Core\Configuration\EnvRequired;
+use Anodio\Core\Configuration\EnvRequiredNotEmpty;
 use DI\ContainerBuilder;
 use olvlvl\ComposerAttributeCollector\Attributes;
 
@@ -36,7 +36,7 @@ class Config extends AbstractAttribute
     {
         $reflectionClass = new \ReflectionClass($className);
         if (!$reflectionClass->isSubclassOf(AbstractConfig::class)) {
-            throw new \Exception('The class ' . $className . ' must extend Bicycle\\Core\\AttributeInterfaces\\AbstractConfig');
+            throw new \Exception('The class ' . $className . ' must extend Anodio\\Core\\AttributeInterfaces\\AbstractConfig');
         }
         if ($reflectionClass->getParentClass()->name!=AbstractConfig::class) {
             //config redefines another one

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\Core\Abstraction;
+namespace Anodio\Core\Abstraction;
 
 abstract class AbstractAttribute
 {

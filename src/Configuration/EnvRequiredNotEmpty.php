@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\Core\Configuration;
+namespace Anodio\Core\Configuration;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 class EnvRequiredNotEmpty

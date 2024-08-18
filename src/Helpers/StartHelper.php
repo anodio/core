@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\Core\Helpers;
+namespace Anodio\Core\Helpers;
 
 class StartHelper
 {

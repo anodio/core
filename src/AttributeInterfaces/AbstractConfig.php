@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\Core\AttributeInterfaces;
+namespace Anodio\Core\AttributeInterfaces;
 
 use DI\Attribute\Inject;
 

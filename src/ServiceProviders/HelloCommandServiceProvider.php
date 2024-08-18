@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\Core\ServiceProviders;
+namespace Anodio\Core\ServiceProviders;
 
-use Bicycle\Core\AttributeInterfaces\ServiceProviderInterface;
-use Bicycle\Core\Attributes\ServiceProvider;
+use Anodio\Core\AttributeInterfaces\ServiceProviderInterface;
+use Anodio\Core\Attributes\ServiceProvider;
 
 #[ServiceProvider]
 class HelloCommandServiceProvider implements ServiceProviderInterface

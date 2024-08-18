@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\Core\Attributes;
+namespace Anodio\Core\Attributes;
 
-use Bicycle\Core\Abstraction\AbstractAttribute;
-use Bicycle\Core\AttributeInterfaces\ServiceProviderInterface;
+use Anodio\Core\Abstraction\AbstractAttribute;
+use Anodio\Core\AttributeInterfaces\ServiceProviderInterface;
 use DI\ContainerBuilder;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
@@ -26,7 +26,7 @@ class ServiceProvider extends AbstractAttribute
     {
         $reflectionClass = new \ReflectionClass($className);
         if (!$reflectionClass->implementsInterface(ServiceProviderInterface::class)) {
-            throw new \Exception('The class ' . $className . ' must implement Bicycle\\Core\\AttributeInterfaces\\ServiceProviderInterface');
+            throw new \Exception('The class ' . $className . ' must implement Anodio\\Core\\AttributeInterfaces\\ServiceProviderInterface');
         }
 
         /** @var ServiceProviderInterface $provider */

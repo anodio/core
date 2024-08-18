@@ -1,9 +1,9 @@
 <?php
 
-namespace Bicycle\Core\Loaders;
+namespace Anodio\Core\Loaders;
 
-use Bicycle\Core\AttributeInterfaces\LoaderInterface;
-use Bicycle\Core\Attributes\Loader;
+use Anodio\Core\AttributeInterfaces\LoaderInterface;
+use Anodio\Core\Attributes\Loader;
 use DI\ContainerBuilder;
 use olvlvl\ComposerAttributeCollector\Attributes;
 
@@ -13,10 +13,10 @@ class ExceptionTrapLoader implements LoaderInterface
 
     public function load(ContainerBuilder $containerBuilder): void
     {
-        $targets = Attributes::findTargetClasses(\Bicycle\Core\Attributes\ExceptionTrap::class);
+        $targets = Attributes::findTargetClasses(\Anodio\Core\Attributes\ExceptionTrap::class);
 
         foreach ($targets as $target) {
-            if (!is_a($target->attribute, \Bicycle\Core\Attributes\ExceptionTrap::class)) {
+            if (!is_a($target->attribute, \Anodio\Core\Attributes\ExceptionTrap::class)) {
                 continue;
             }
             $target->attribute->setContainerBuilder($containerBuilder);

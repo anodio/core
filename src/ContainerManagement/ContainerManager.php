@@ -1,13 +1,14 @@
 <?php
 
-namespace Bicycle\Core\ContainerManagement;
+namespace Anodio\Core\ContainerManagement;
 
-use Bicycle\Core\Abstraction\AbstractAttribute;
-use Bicycle\Core\AttributeInterfaces\LoaderInterface;
-use Bicycle\Core\Attributes\Loader;
+use Anodio\Core\Abstraction\AbstractAttribute;
+use Anodio\Core\AttributeInterfaces\LoaderInterface;
+use Anodio\Core\Attributes\Loader;
 use DI\Container;
 use DI\ContainerBuilder;
 use olvlvl\ComposerAttributeCollector\Attributes;
+use Psr\Container\ContainerInterface;
 
 class ContainerManager
 {
@@ -21,10 +22,15 @@ class ContainerManager
         self::$builder = new \DI\ContainerBuilder();
         self::$builder->enableCompilation(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
         self::$builder->useAttributes(true);
-        if (true || $this->vendorChanged() || $this->appChanged() || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME)) {
+        if ($this->vendorChanged() || $this->appChanged() || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME)) {
             shell_exec('rm -rf '.SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
             $this->runLoaders(self::$builder);
         }
+        self::$builder->addDefinitions([
+            Container::class=>\DI\factory(function(ContainerInterface $c) {
+                return $c;
+            })
+        ]);
 
         $container = self::$builder->build();
         if ($this->vendorChanged() || $this->appChanged()) {

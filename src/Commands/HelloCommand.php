@@ -1,12 +1,12 @@
 <?php
 
-namespace Bicycle\Core\Commands;
+namespace Anodio\Core\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[\Bicycle\Core\Attributes\Command(
+#[\Anodio\Core\Attributes\Command(
     name: 'hello',
     description: 'Say hello to the user'
 )]

@@ -1,6 +1,6 @@
 <?php
 
-namespace Bicycle\Core\Attributes;
+namespace Anodio\Core\Attributes;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class Command
 {
