@@ -27,7 +27,7 @@ class ContainerManager
         self::$builder = new \DI\ContainerBuilder();
         self::$builder->enableCompilation(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
         self::$builder->useAttributes(true);
-        if ($this->vendorChanged() || $this->appChanged() || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME)) {
+        if ($this->testsChanged() || $this->vendorChanged() || $this->appChanged() || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME)) {
             shell_exec('rm -rf '.SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
             $this->runLoaders(self::$builder);
         }
@@ -72,6 +72,18 @@ class ContainerManager
         }
     }
 
+    private function getTestsHashFromCache() {
+        if (!file_exists(SYSTEM_PATH . '/hashes/tests_hash')) {
+            @mkdir(SYSTEM_PATH . '/hashes', 0777, true);
+            file_put_contents(SYSTEM_PATH . '/hashes/tests_hash', '10101010101010');
+        }
+        return file_get_contents(SYSTEM_PATH . '/hashes/tests_hash');
+    }
+
+    private function testsChanged(): bool {
+        return $this->getTestsHashFromCache() !== $this->getHashOfAllMimeTypes(BASE_PATH.'/tests');
+    }
+
     private function vendorChanged(): bool
     {
         return $this->getVendorHashFromCache() !== $this->collectVendorHash();
@@ -111,6 +123,9 @@ class ContainerManager
 
         $appHash = $this->getHashOfAllMimeTypes(BASE_PATH.'/app');
         file_put_contents(SYSTEM_PATH . '/hashes/app_hash', $appHash);
+
+        $testsHash = $this->getHashOfAllMimeTypes(BASE_PATH.'/tests');
+        file_put_contents(SYSTEM_PATH . '/hashes/tests_hash', $testsHash);
     }
 
     private function getHashOfAllMimeTypes(string $path, $hash = ''): string
