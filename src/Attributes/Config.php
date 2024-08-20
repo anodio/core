@@ -94,12 +94,8 @@ class Config extends AbstractAttribute
 
                 return new $className($data);
             })->parameter('className', $className)->parameter('dotenv', \DI\get(\Dotenv\Dotenv::class)),
+            'config.'.$this->name => \DI\get($nameInContainer),
         ]);
-//        if ($redefines!==$className) {
-//            $this->containerBuilder->addDefinitions([
-//                $className => \DI\get($redefines),
-//            ]);
-//        }
         return true;
     }
 }

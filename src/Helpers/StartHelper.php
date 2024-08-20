@@ -5,6 +5,7 @@ namespace Anodio\Core\Helpers;
 class StartHelper
 {
     public function preload($currentDirectory) {
+        require_once dirname(__FILE__).'/../../helpers/laravel-helpers.php';
         if (!defined('SYSTEM_PATH')) define('SYSTEM_PATH', $currentDirectory.'/system');
         $this->createSystemDirectory(SYSTEM_PATH);
         if (!defined('BASE_PATH')) define('BASE_PATH', $currentDirectory);
