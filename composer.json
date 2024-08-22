@@ -2,8 +2,7 @@
   "name": "anodio/core",
   "autoload": {
     "psr-4": {
-      "Anodio\\Core\\": "src/",
-      "App\\": "../../../../app/"
+      "Anodio\\Core\\": "src/"
     }
   },
   "require": {
