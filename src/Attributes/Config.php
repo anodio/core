@@ -19,7 +19,9 @@ class Config extends AbstractAttribute
 
     public function __construct(public string $name)
     {
-
+        if (str_contains($name, '.')) {
+            throw new \Exception('The name of the config must not contain a dot');
+        }
     }
 
     public function setAllowRedefine(bool $allowRedefine): void
