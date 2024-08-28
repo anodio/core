@@ -2,10 +2,13 @@
 
 namespace Anodio\Core\Config;
 
+use Anodio\Core\AttributeInterfaces\AbstractConfig;
+use Anodio\Core\Attributes\Config;
 use Anodio\Core\Configuration\Env;
 use Monolog\Handler\StreamHandler;
 
-class LoggerConfig
+#[Config('logger')]
+class LoggerConfig extends AbstractConfig
 {
     #[Env('LOG_HANDLER', default: StreamHandler::class)]
     public string $logHandler;

@@ -12,6 +12,7 @@ $manager = new \Anodio\Core\ContainerManagement\ContainerManager();
 \Anodio\Core\ContainerStorage::init();
 $container = $manager->initContainer();
 ContainerStorage::setContainer($container);
+ContainerStorage::setMainContainer($container);
 
 $container->get('application')->run();
 

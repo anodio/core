@@ -12,6 +12,7 @@ class ContainerStorage
     public static int $size = 9999;
 
     private static int $sizeLen = 4;
+    private static Container $mainContainer;
 
     /**
      * get last three numbers of coroutine number to fit all coroutines by id into size 1000
@@ -34,6 +35,17 @@ class ContainerStorage
             throw new \Exception('Container not found');
         }
         return self::$containers[$coroutineId];
+    }
+
+    public static function setMainContainer(Container $container) {
+        if (isset(self::$mainContainer)) {
+            throw new \Exception('Main container already exists');
+        }
+        self::$mainContainer = $container;
+    }
+
+    public static function getMainContainer(): Container {
+        return self::$mainContainer;
     }
 
     public static function setContainer(Container $container): void {

@@ -2,7 +2,7 @@
 
 namespace Anodio\Core\Logger;
 
-use Anodio\Http\Config\HttpServerConfig;
+use Anodio\Core\Config\LoggerConfig;
 use DI\Attribute\Inject;
 use Monolog\Handler\FormattableHandlerInterface;
 use Monolog\Handler\StreamHandler;
@@ -12,10 +12,10 @@ class LoggerFactory
 {
 
     #[Inject]
-    public HttpServerConfig $config;
+    public LoggerConfig $config;
 
     public function createLogger() {
-        $logger = new Logger('HttpServerLogger');
+        $logger = new Logger('Logger');
         if (empty($this->config->logDestination)) {
             $logDestination = 'php://stdout';
         } else {
@@ -37,9 +37,13 @@ class LoggerFactory
             /**
              * @var FormattableHandlerInterface $handler
              */
-            $handler = new $this->config->logHandler($logDestination, $logLevel);
+            if ($this->config->logHandler==='\\Monolog\\Handler\\NullHandler') {
+                $handler = new $this->config->logHandler($logLevel);
+            } else {
+                $handler = new $this->config->logHandler($logDestination, $logLevel);
+                $handler->setFormatter($logFormatter);
+            }
         }
-        $handler->setFormatter($logFormatter);
         $logger->pushHandler($handler);
         return $logger;
     }

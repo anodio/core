@@ -23,12 +23,20 @@ class Loader extends AbstractAttribute
 
     public function onClass(string $className): bool
     {
-        if (!is_subclass_of($className, \Anodio\Core\AttributeInterfaces\LoaderInterface::class)) {
-            throw new \Exception('The class ' . $className . ' must implement Anodio\\Core\\AttributeInterfaces\\LoaderInterface');
+        try {
+            if (!is_subclass_of($className, \Anodio\Core\AttributeInterfaces\LoaderInterface::class)) {
+                throw new \Exception('The class ' . $className . ' must implement Anodio\\Core\\AttributeInterfaces\\LoaderInterface');
+            }
+            /** @var LoaderInterface $exemplar */
+            $exemplar = new $className();
+            $exemplar->load($this->containerBuilder);
+        } catch (\Throwable $e) {
+            echo $e->getMessage()."\n";
+            echo $e->getFile().':'.$e->getLine()."\n";
+            echo $e->getTraceAsString()."\n";
+            exit(1);
         }
-        /** @var LoaderInterface $exemplar */
-        $exemplar = new $className();
-        $exemplar->load($this->containerBuilder);
+
         return true;
     }
 }

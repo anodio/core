@@ -13,13 +13,33 @@ class ServiceProviderLoader implements LoaderInterface
 {
     public function load(ContainerBuilder $containerBuilder): void
     {
-        foreach (Attributes::findTargetClasses(ServiceProvider::class) as $target) {
-                if (!is_a($target->attribute, ServiceProvider::class)) {
-                    continue;
-                }
-                $target->attribute->setContainerBuilder($containerBuilder);
-                $target->attribute->onClass($target->name);
+        $targets = Attributes::findTargetClasses(ServiceProvider::class);
+        $targets = $this->sort($targets);
+        foreach ($targets as $target) {
+            if (!is_a($target->attribute, ServiceProvider::class)) {
+                continue;
             }
+            $target->attribute->setContainerBuilder($containerBuilder);
+            $target->attribute->onClass($target->name);
         }
+    }
+
+    /**
+     * @param array $targets
+     * @return array
+     */
+    private function sort(array $targets): array
+    {
+        usort($targets, function ($a, $b) {
+            if ($a->attribute->priority < $b->attribute->priority) {
+                return 1;
+            }
+            if ($a->attribute->priority > $b->attribute->priority) {
+                return -1;
+            }
+            return 0;
+        });
+        return $targets;
+    }
 
 }

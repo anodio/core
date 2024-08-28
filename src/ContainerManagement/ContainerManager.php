@@ -14,19 +14,21 @@ use Psr\Container\ContainerInterface;
 class ContainerManager
 {
     private static ContainerBuilder $builder;
-    public static function createContainer(): Container {
+    public static function createContainer($enableCompilation = true): Container {
         if (!isset(static::$builder)) {
             $containerManager = new ContainerManager();
-            $container = $containerManager->initContainer();
+            $container = $containerManager->initContainer($enableCompilation);
             return $container;
         }
         return static::$builder->build();
     }
 
-    public function initContainer(): Container
+    public function initContainer($enableCompilation = true): Container
     {
         self::$builder = new \DI\ContainerBuilder();
-        self::$builder->enableCompilation(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
+        if ($enableCompilation) {
+            self::$builder->enableCompilation(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
+        }
         self::$builder->useAttributes(true);
         if ($this->testsChanged() || $this->vendorChanged() || $this->appChanged() || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME)) {
             shell_exec('rm -rf '.SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
