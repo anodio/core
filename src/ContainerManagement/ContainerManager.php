@@ -25,12 +25,16 @@ class ContainerManager
 
     public function initContainer($enableCompilation = true): Container
     {
+        if ($this->devModeEnabledThoughDotEnvFile() && $this->recollectAttributesInDevMode()) {
+            $this->searchAttributes();
+        }
+        require_once BASE_PATH.'/vendor/attributes.php';
         self::$builder = new \DI\ContainerBuilder();
         if ($enableCompilation) {
             self::$builder->enableCompilation(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
         }
         self::$builder->useAttributes(true);
-        if ($this->testsChanged() || $this->vendorChanged() || $this->appChanged() || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME)) {
+        if ($this->devModeEnabledThoughDotEnvFile() || $this->testsChanged() || $this->vendorChanged() || $this->appChanged() || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME)) {
             shell_exec('rm -rf '.SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
             $this->runLoaders(self::$builder);
         }
@@ -145,5 +149,46 @@ class ContainerManager
             $hash = hash('xxh3',   $hash.filemtime(BASE_PATH.'/.env'));
         }
         return $hash;
+    }
+
+    private function devModeEnabledThoughDotEnvFile()
+    {
+        if (file_exists(BASE_PATH.'/.env')) {
+            $env = file_get_contents(BASE_PATH.'/.env');
+            $env = explode("\n", $env);
+            foreach ($env as $line) {
+                if (trim($line) === '') {
+                    continue;
+                }
+                $exploded = explode('=', $line);
+                if ($exploded[0] === 'DEV_MODE' && $exploded[1] === 'true') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function searchAttributes()
+    {
+        shell_exec('composer dump');
+    }
+
+    private function recollectAttributesInDevMode()
+    {
+        if (file_exists(BASE_PATH.'/.env')) {
+            $env = file_get_contents(BASE_PATH.'/.env');
+            $env = explode("\n", $env);
+            foreach ($env as $line) {
+                if (trim($line) === '') {
+                    continue;
+                }
+                $exploded = explode('=', $line);
+                if ($exploded[0] === 'RECOLLECT_ATTRIBUTES_IN_DEV_MODE' && $exploded[1] === 'true') {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
