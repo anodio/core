@@ -28,13 +28,6 @@
             ]
         }
     },
-    "archive": {
-        "exclude": [
-            "/tests",
-            "phpunit.xml",
-            "Readme.md"
-        ]
-    },
     "config": {
         "allow-plugins": {
             "olvlvl/composer-attribute-collector": true
