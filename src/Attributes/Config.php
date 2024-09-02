@@ -66,7 +66,7 @@ class Config extends AbstractAttribute
                     if (!property_exists($className, $target->name)) {
                         continue;
                     }
-                    $data[$target->name] = $_ENV[$target->attribute->name] ?? $target->attribute->default;
+                    $data[$target->name] = $_ENV[$target->attribute->name] ?? $_SERVER[$target->attribute->name] ?? $target->attribute->default;
                 }
 
                 foreach (Attributes::findTargetProperties(EnvRequired::class) as $target) {
@@ -77,7 +77,7 @@ class Config extends AbstractAttribute
                         continue;
                     }
                     $dotenv->required($target->attribute->name);
-                    $data[$target->name] = $_ENV[$target->attribute->name];
+                    $data[$target->name] = $_ENV[$target->attribute->name]?? $_SERVER[$target->attribute->name];
                 }
 
                 foreach (Attributes::findTargetProperties(EnvRequiredNotEmpty::class) as $target) {
@@ -91,7 +91,7 @@ class Config extends AbstractAttribute
                         throw new \Exception('The env field ' . $target->attribute->name . ' must be set');
                     }
                     $dotenv->required($target->attribute->name)->notEmpty();
-                    $data[$target->name] = $_ENV[$target->attribute->name];
+                    $data[$target->name] = $_ENV[$target->attribute->name] ?? $_SERVER[$target->attribute->name];
                 }
 
                 return new $className($data);
