@@ -20,9 +20,6 @@ class ContainerStorage
      */
     public static function getAdoptedCoroutineNumber(): int {
         $coroutineId = Coroutine::getCurrent()->getId();
-//        while ($coroutineId > self::$size) {
-//            $coroutineId = $coroutineId / 10;
-//        }
         if (strlen($coroutineId)>self::$sizeLen) {
             $coroutineId = substr($coroutineId, -self::$sizeLen);
         }

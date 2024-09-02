@@ -14,9 +14,9 @@ abstract class AbstractConfig
     public function __construct(array $data = [])
     {
         foreach ($data as $key=>$value) {
-            if ($value=='false') {
+            if (trim($value)==='false' || $value===false) {
                 $this->$key = false;
-            } elseif ($value=='true') {
+            } elseif (trim($value)==='true' || $value===true) {
                 $this->$key = true;
             } else {
                 $this->$key = $value;
