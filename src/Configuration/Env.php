@@ -7,7 +7,8 @@ class Env
 {
     public function __construct(
         public string $name,
-        public mixed $default = null
+        public mixed $default = null,
+        public string $comment = ''
     ) {
     }
 }

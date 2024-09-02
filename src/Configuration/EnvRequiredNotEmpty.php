@@ -6,7 +6,8 @@ namespace Anodio\Core\Configuration;
 class EnvRequiredNotEmpty
 {
     public function __construct(
-        public string $name
+        public string $name,
+        public string $comment = ''
     ) {
     }
 }
