@@ -21,4 +21,7 @@ class LoggerConfig extends AbstractConfig
 
     #[Env('LOG_DESTINATION', default: 'php://stdout')]
     public string $logDestination = 'php://stdout';
+
+    #[Env('LOG_PROCESSOR', default: 'Anodio\Core\Logger\LogContextProcessor')]
+    public string $logProcessor;
 }

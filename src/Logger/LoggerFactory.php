@@ -31,6 +31,11 @@ class LoggerFactory
         } else {
             $logFormatter = new $this->config->logFormatter();
         }
+        if (empty($this->config->logProcessor)) {
+            $processor = new LogContextProcessor();
+        } else {
+            $processor = new $this->config->logProcessor();
+        }
         if (empty($this->config->logHandler)) {
             $handler = new StreamHandler('php://stdout', $logLevel);
         } else {
@@ -45,6 +50,7 @@ class LoggerFactory
             }
         }
         $logger->pushHandler($handler);
+        $logger->pushProcessor($processor);
         return $logger;
     }
 }

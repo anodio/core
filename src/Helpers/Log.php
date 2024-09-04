@@ -51,9 +51,7 @@ class Log
     public static function log($level, $message, array $context = [])
     {
         $container = \Anodio\Core\ContainerStorage::getContainer();
-        foreach (Context::get() as $key=>$value) {
-            $context[$key] = $value;
-        }
+
         /** @var LoggerInterface $logger */
         $logger = $container->get('logger');
         $logger->log($level, $message, $context);
