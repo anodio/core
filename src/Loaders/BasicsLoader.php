@@ -15,13 +15,6 @@ class BasicsLoader implements LoaderInterface
 {
     public function load(ContainerBuilder $containerBuilder): void
     {
-        $containerBuilder->addDefinitions([
-            \Dotenv\Dotenv::class => function () {
-                $dotenv = \Dotenv\Dotenv::createImmutable(BASE_PATH);
-                $dotenv->safeLoad();
-                return $dotenv;
-            }
-        ]);
 
         $targets = Attributes::findTargetClasses(Command::class);
         $commandClassesArray = [];

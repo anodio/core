@@ -15,6 +15,9 @@ class ConfigLoader implements LoaderInterface
     {
         $targets = Attributes::findTargetClasses(Config::class);
 
+        $dotenv = \Dotenv\Dotenv::createImmutable(BASE_PATH);
+        $dotenv->safeLoad();
+
         foreach ($targets as $key=>$target) {
             if (!is_a($target->attribute, Config::class)) {
                 unset($targets[$key]);
