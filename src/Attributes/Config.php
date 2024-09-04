@@ -6,8 +6,6 @@ namespace Anodio\Core\Attributes;
 use Anodio\Core\Abstraction\AbstractAttribute;
 use Anodio\Core\AttributeInterfaces\AbstractConfig;
 use Anodio\Core\Configuration\Env;
-use Anodio\Core\Configuration\EnvRequired;
-use Anodio\Core\Configuration\EnvRequiredNotEmpty;
 use DI\ContainerBuilder;
 use olvlvl\ComposerAttributeCollector\Attributes;
 
@@ -55,47 +53,23 @@ class Config extends AbstractAttribute
             $nameInContainer = $className;
         }
 
+        $data = [];
+        foreach (Attributes::findTargetProperties(Env::class) as $target) {
+            if ($target->class!=$className) {
+                continue;
+            }
+            if (!property_exists($className, $target->name)) {
+                continue;
+            }
+            $data[$target->name] = $_ENV[$target->attribute->name] ?? $_SERVER[$target->attribute->name] ?? $target->attribute->default;
+        }
+
+
         $this->containerBuilder->addDefinitions([
-            $nameInContainer => \DI\factory(function (string $className, \Dotenv\Dotenv $dotenv) {
-
-                $data = [];
-                foreach (Attributes::findTargetProperties(Env::class) as $target) {
-                    if ($target->class!=$className) {
-                        continue;
-                    }
-                    if (!property_exists($className, $target->name)) {
-                        continue;
-                    }
-                    $data[$target->name] = $_ENV[$target->attribute->name] ?? $_SERVER[$target->attribute->name] ?? $target->attribute->default;
-                }
-
-                foreach (Attributes::findTargetProperties(EnvRequired::class) as $target) {
-                    if ($target->class!=$className) {
-                        continue;
-                    }
-                    if (!property_exists($className, $target->name)) {
-                        continue;
-                    }
-                    $dotenv->required($target->attribute->name);
-                    $data[$target->name] = $_ENV[$target->attribute->name]?? $_SERVER[$target->attribute->name];
-                }
-
-                foreach (Attributes::findTargetProperties(EnvRequiredNotEmpty::class) as $target) {
-                    if ($target->class!=$className) {
-                        continue;
-                    }
-                    if (!property_exists($className, $target->name)) {
-                        continue;
-                    }
-                    if (is_null($_ENV[$target->attribute->name])) {
-                        throw new \Exception('The env field ' . $target->attribute->name . ' must be set');
-                    }
-                    $dotenv->required($target->attribute->name)->notEmpty();
-                    $data[$target->name] = $_ENV[$target->attribute->name] ?? $_SERVER[$target->attribute->name];
-                }
+            $nameInContainer => \DI\factory(function (string $className, array $data) {
 
                 return new $className($data);
-            })->parameter('className', $className)->parameter('dotenv', \DI\get(\Dotenv\Dotenv::class)),
+            })->parameter('className', $className)->parameter('data', $data),
             'config.'.$this->name => \DI\get($nameInContainer),
         ]);
         return true;

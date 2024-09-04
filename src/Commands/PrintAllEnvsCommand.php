@@ -3,8 +3,6 @@
 namespace Anodio\Core\Commands;
 
 use Anodio\Core\Configuration\Env;
-use Anodio\Core\Configuration\EnvRequired;
-use Anodio\Core\Configuration\EnvRequiredNotEmpty;
 use olvlvl\ComposerAttributeCollector\Attributes;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,30 +17,6 @@ class PrintAllEnvsCommand extends Command
         $targets = Attributes::findTargetProperties(Env::class);
         foreach ($targets as $target) {
             if (!$target->attribute instanceof Env) {
-                continue;
-            }
-            if (in_array($target->attribute->name, $printed)) {
-                continue;
-            }
-            $this->printEnv($output, $target);
-            $printed[] = $target->attribute->name;
-        }
-
-        $targets = Attributes::findTargetProperties(EnvRequiredNotEmpty::class);
-        foreach ($targets as $target) {
-            if (!$target->attribute instanceof EnvRequiredNotEmpty) {
-                continue;
-            }
-            if (in_array($target->attribute->name, $printed)) {
-                continue;
-            }
-            $this->printEnv($output, $target);
-            $printed[] = $target->attribute->name;
-        }
-
-        $targets = Attributes::findTargetProperties(EnvRequired::class);
-        foreach ($targets as $target) {
-            if (!$target->attribute instanceof EnvRequired) {
                 continue;
             }
             if (in_array($target->attribute->name, $printed)) {
