@@ -3,12 +3,20 @@
 namespace Anodio\Core\ContainerManagement;
 
 use Anodio\Core\Abstraction\AbstractAttribute;
-use Anodio\Core\AttributeInterfaces\LoaderInterface;
 use Anodio\Core\Attributes\Loader;
-use Anodio\Core\ContainerStorage;
+use Composer\IO\NullIO;
 use DI\Container;
 use DI\ContainerBuilder;
 use olvlvl\ComposerAttributeCollector\Attributes;
+use olvlvl\ComposerAttributeCollector\ClassAttributeCollector;
+use olvlvl\ComposerAttributeCollector\Datastore\RuntimeDatastore;
+use olvlvl\ComposerAttributeCollector\Filter\Chain;
+use olvlvl\ComposerAttributeCollector\Filter\ContentFilter;
+use olvlvl\ComposerAttributeCollector\Filter\InterfaceFilter;
+use olvlvl\ComposerAttributeCollector\MemoizeAttributeCollector;
+use olvlvl\ComposerAttributeCollector\MemoizeClassMapFilter;
+use olvlvl\ComposerAttributeCollector\MemoizeClassMapGenerator;
+use olvlvl\ComposerAttributeCollector\TransientCollectionRenderer;
 use Psr\Container\ContainerInterface;
 
 class ContainerManager
@@ -25,7 +33,10 @@ class ContainerManager
 
     public function initContainer($enableCompilation = true): Container
     {
-        if ($this->devModeEnabledThoughDotEnvFile() && $this->recollectAttributesInDevMode()) {
+        $needToResearchAttributes = $this->needToResearchAttributes();
+        $needToRebuildContainer = $this->needToRebuildContainer();
+
+        if ($needToResearchAttributes) {
             $this->searchAttributes();
         }
         require_once BASE_PATH.'/vendor/attributes.php';
@@ -34,7 +45,7 @@ class ContainerManager
             self::$builder->enableCompilation(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
         }
         self::$builder->useAttributes(true);
-        if ($this->devModeEnabledThoughDotEnvFile() || $this->testsChanged() || $this->vendorChanged() || $this->appChanged() || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME)) {
+        if ($needToRebuildContainer) {
             shell_exec('rm -rf '.SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
             $this->runLoaders(self::$builder);
         }
@@ -45,7 +56,7 @@ class ContainerManager
         ]);
 
         $container = self::$builder->build();
-        if ($this->vendorChanged() || $this->appChanged()) {
+        if ($needToResearchAttributes || $needToRebuildContainer) {
             $this->updateHashes();
         }
         return $container;
@@ -133,6 +144,9 @@ class ContainerManager
 
         $testsHash = $this->getHashOfAllMimeTypes(BASE_PATH.'/tests');
         file_put_contents(SYSTEM_PATH . '/hashes/tests_hash', $testsHash);
+
+        $attributePathsHash = $this->collectHashOfAllAttributesPaths();
+        file_put_contents(SYSTEM_PATH . '/hashes/attribute_hash', $attributePathsHash);
     }
 
     private function getHashOfAllMimeTypes(string $path, $hash = ''): string
@@ -151,7 +165,7 @@ class ContainerManager
         return $hash;
     }
 
-    private function devModeEnabledThoughDotEnvFile()
+    private function devModeEnabledInDotEnvFile()
     {
         if (file_exists(BASE_PATH.'/.env')) {
             $env = file_get_contents(BASE_PATH.'/.env');
@@ -169,9 +183,77 @@ class ContainerManager
         return false;
     }
 
+    public function attributeScannablePaths() {
+        return [
+            "vendor/anodio",
+            "../protoPhp"
+        ];
+    }
+
+    public function getAttributeHashFromCache() {
+        if (!file_exists(SYSTEM_PATH . '/hashes/attribute_hash')) {
+            @mkdir(SYSTEM_PATH . '/hashes', 0777, true);
+            file_put_contents(SYSTEM_PATH . '/hashes/attribute_hash', '10101010101010');
+        }
+        return file_get_contents(SYSTEM_PATH . '/hashes/attribute_hash');
+    }
+
+    public function collectHashOfAllAttributesPaths(): string {
+        $hash = '';
+        foreach ($this->attributeScannablePaths() as $include) {
+            $hash = hash('xxh3', $hash.$this->getHashOfAllMimeTypes($include));
+        }
+        return $hash;
+    }
+
+    public function attributeScannablePathsChanged(): bool {
+        return $this->getAttributeHashFromCache() !== $this->collectHashOfAllAttributesPaths();
+    }
+
+    public function excludeByRegExp(): ?string {
+        return null;
+    }
+
     private function searchAttributes()
     {
-        shell_exec('composer dump');
+        $start = microtime(true);
+        $datastore = new RuntimeDatastore();
+        $datastore->set('allo', ['allo']);
+        $io = new NullIO();
+        $classMapGenerator = new MemoizeClassMapGenerator($datastore, $io);
+        foreach ($this->attributeScannablePaths() as $include) {
+            $classMapGenerator->scanPaths($include, $this->excludeByRegExp());
+        }
+
+
+        $classMap = $classMapGenerator->getMap();
+        $elapsed = microtime(true) - $start;
+        echo "Scanned paths in $elapsed".PHP_EOL;
+
+        $start = microtime(true);
+        $classMapFilter = new MemoizeClassMapFilter($datastore, $io);
+        $filter = new Chain([
+            new ContentFilter(),
+            new InterfaceFilter()
+        ]);
+        $classMap = $classMapFilter->filter(
+            $classMap,
+            fn (string $class, string $filepath): bool => $filter->filter($filepath, $class, $io)
+        );
+        $elapsed = microtime(true) - $start;
+        echo "Generating attributes file: filtered class map in $elapsed".PHP_EOL;
+
+
+        $start = microtime(true);
+        $attributeCollector = new MemoizeAttributeCollector(new ClassAttributeCollector($io), $datastore, $io);
+        $collection = $attributeCollector->collectAttributes($classMap);
+        $elapsed = microtime(true) - $start;
+        echo "Generating attributes file: collected attributes in $elapsed".PHP_EOL;
+
+        $start = microtime(true);
+        file_put_contents(BASE_PATH.'/vendor/attributes.php', TransientCollectionRenderer::render($collection));
+        $elapsed = microtime(true) - $start;
+        echo "Generating attributes file: rendered code in $elapsed".PHP_EOL;
     }
 
     private function recollectAttributesInDevMode()
@@ -190,5 +272,20 @@ class ContainerManager
             }
         }
         return false;
+    }
+
+    private function needToRebuildContainer(): bool
+    {
+        return $this->needToResearchAttributes();
+    }
+
+    public function needToResearchAttributes(): bool {
+        return $this->devModeEnabledInDotEnvFile()
+            || $this->attributeScannablePathsChanged()
+            || $this->testsChanged()
+            || $this->vendorChanged()
+            || $this->appChanged()
+            || $this->recollectAttributesInDevMode()
+            || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
     }
 }
