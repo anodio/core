@@ -184,10 +184,13 @@ class ContainerManager
     }
 
     public function attributeScannablePaths() {
-        return [
-            "vendor/anodio",
-            "../protoPhp"
-        ];
+        if (file_exists(BASE_PATH.'/additional_paths.php')) {
+            $additionalPaths = require_once BASE_PATH.'/additional_paths.php';
+        }
+        return array_merge([
+            BASE_PATH.'/vendor/anodio',
+            BASE_PATH.'/protoPhp'
+        ], $additionalPaths ?? []);
     }
 
     public function getAttributeHashFromCache() {
