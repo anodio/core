@@ -151,6 +151,9 @@ class ContainerManager
 
     private function getHashOfAllMimeTypes(string $path, $hash = ''): string
     {
+        if (!is_dir($path)) {
+            return $hash;
+        }
         $files = glob($path . "/*");
         foreach ($files as $file) {
             if (is_dir($file)) {
@@ -189,7 +192,7 @@ class ContainerManager
         }
         return array_merge([
             BASE_PATH.'/vendor/anodio',
-            BASE_PATH.'/protoPhp'
+            BASE_PATH.'/../protoPhp'
         ], $additionalPaths ?? []);
     }
 
@@ -225,6 +228,10 @@ class ContainerManager
         $io = new NullIO();
         $classMapGenerator = new MemoizeClassMapGenerator($datastore, $io);
         foreach ($this->attributeScannablePaths() as $include) {
+            if (!is_dir($include)) {
+                continue;
+            }
+            echo 'Scanning path: '.$include.PHP_EOL;
             $classMapGenerator->scanPaths($include, $this->excludeByRegExp());
         }
 
