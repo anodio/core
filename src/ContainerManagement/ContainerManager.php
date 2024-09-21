@@ -41,6 +41,7 @@ class ContainerManager
         }
         require_once BASE_PATH.'/vendor/attributes.php';
         self::$builder = new \DI\ContainerBuilder();
+        self::$builder->useAutowiring(false);
         if ($enableCompilation) {
             self::$builder->enableCompilation(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
         }
@@ -191,6 +192,7 @@ class ContainerManager
             $additionalPaths = require_once BASE_PATH.'/additional_paths.php';
         }
         return array_merge([
+            BASE_PATH.'/app',
             BASE_PATH.'/vendor/anodio',
             BASE_PATH.'/../protoPhp'
         ], $additionalPaths ?? []);
