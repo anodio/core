@@ -3,8 +3,10 @@
 namespace Anodio\Core\DI\Attributes;
 
 use Anodio\Core\Abstraction\AbstractAttribute;
+use JetBrains\PhpStorm\Deprecated;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
+#[Deprecated(reason: 'Use ServiceProvider instead')]
 class Autowire extends AbstractAttribute
 {
     private \DI\ContainerBuilder $containerBuilder;

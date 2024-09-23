@@ -194,7 +194,9 @@ class ContainerManager
         return array_merge([
             BASE_PATH.'/app',
             BASE_PATH.'/vendor/anodio',
-            BASE_PATH.'/../protoPhp'
+            BASE_PATH.'/../protoPhp',
+            BASE_PATH.'/vendor/symfony/routing/Attribute',
+            BASE_PATH.'/vendor/symfony/event-dispatcher/Attribute'
         ], $additionalPaths ?? []);
     }
 

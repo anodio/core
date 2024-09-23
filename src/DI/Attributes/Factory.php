@@ -4,21 +4,26 @@ namespace Anodio\Core\DI\Attributes;
 
 use Anodio\Core\Abstraction\AbstractAttribute;
 use Anodio\Core\DI\Abstractions\FactoryInterface;
+use Attribute;
 use DI\ContainerBuilder;
+use DI\DependencyException;
+use JetBrains\PhpStorm\Deprecated;
+use ReflectionClass;
 
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[Attribute(Attribute::TARGET_CLASS)]
+#[Deprecated(reason: 'Use ServiceProvider instead')]
 class Factory extends AbstractAttribute
 {
     private ContainerBuilder $containerBuilder;
 
     public function onClass(string $className): bool
     {
-        $reflectionClass = new \ReflectionClass($className);
+        $reflectionClass = new ReflectionClass($className);
         if ($reflectionClass->getConstructor()) {
-            throw new \DI\DependencyException('Class '.$className.' has constructor. Factory can not have any dependencies.');
+            throw new DependencyException('Class '.$className.' has constructor. Factory can not have any dependencies.');
         }
         if (!$reflectionClass->implementsInterface(FactoryInterface::class)) {
-            throw new \DI\DependencyException('Class '.$className.' must implement '.FactoryInterface::class.' interface.');
+            throw new DependencyException('Class '.$className.' must implement '.FactoryInterface::class.' interface.');
         }
         /** @var FactoryInterface $factoryInstance */
         $factoryInstance = new $className();
