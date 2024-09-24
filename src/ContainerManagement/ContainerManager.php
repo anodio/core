@@ -138,6 +138,7 @@ class ContainerManager
      */
     private function updateHashes(): void {
         $hash = $this->collectVendorHash();
+        @mkdir(SYSTEM_PATH . '/hashes', 0777, true);
         file_put_contents(SYSTEM_PATH . '/hashes/vendor_hash', $hash);
 
         $appHash = $this->getHashOfAllMimeTypes(BASE_PATH.'/app');
