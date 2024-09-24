@@ -266,7 +266,8 @@ class ContainerManager
         echo "Generating attributes file: collected attributes in $elapsed".PHP_EOL;
 
         $start = microtime(true);
-        file_put_contents(BASE_PATH.'/vendor/attributes.php', TransientCollectionRenderer::render($collection));
+        //supress. Maybe there is a readonly filesystem? no problem. Will beleive app was built.
+        @file_put_contents(BASE_PATH.'/vendor/attributes.php', TransientCollectionRenderer::render($collection));
         $elapsed = microtime(true) - $start;
         echo "Generating attributes file: rendered code in $elapsed".PHP_EOL;
     }
