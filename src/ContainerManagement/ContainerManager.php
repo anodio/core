@@ -34,7 +34,8 @@ class ContainerManager
     public function initContainer($enableCompilation = true): Container
     {
         $needToResearchAttributes = $this->needToResearchAttributes();
-        $needToRebuildContainer = $this->needToRebuildContainer();
+//        $needToRebuildContainer = $this->needToRebuildContainer();
+        $needToRebuildContainer = $needToResearchAttributes;
 
         if ($needToResearchAttributes) {
             $this->searchAttributes();
@@ -100,6 +101,9 @@ class ContainerManager
     }
 
     private function testsChanged(): bool {
+        if (!file_exists(BASE_PATH.'/tests')) {
+            return false;
+        }
         return $this->getTestsHashFromCache() !== $this->getHashOfAllMimeTypes(BASE_PATH.'/tests');
     }
 
@@ -296,12 +300,41 @@ class ContainerManager
     }
 
     public function needToResearchAttributes(): bool {
-        return $this->devModeEnabledInDotEnvFile()
-            || $this->attributeScannablePathsChanged()
-            || $this->testsChanged()
-            || $this->vendorChanged()
-            || $this->appChanged()
-            || $this->recollectAttributesInDevMode()
-            || !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
+        $devModeEnabledInDotEnvFile = $this->devModeEnabledInDotEnvFile();
+        if ($devModeEnabledInDotEnvFile) {
+            echo 'Because Dev mode enabled in .env file'.PHP_EOL;
+        }
+        $attributeScannablePathsChanged = $this->attributeScannablePathsChanged();
+        if ($attributeScannablePathsChanged) {
+            echo 'Because attribute scannable paths changed'.PHP_EOL;
+        }
+        $testsChanged = $this->testsChanged();
+        if ($testsChanged) {
+            echo 'Because tests changed'.PHP_EOL;
+        }
+        $vendorChanged = $this->vendorChanged();
+        if ($vendorChanged) {
+            echo 'Because vendor changed'.PHP_EOL;
+        }
+        $appChanged = $this->appChanged();
+        if ($appChanged) {
+            echo 'Because app changed'.PHP_EOL;
+        }
+        $recollectAttributesInDevMode = $this->recollectAttributesInDevMode();
+        if ($recollectAttributesInDevMode) {
+            echo 'Because recollect attributes in dev mode'.PHP_EOL;
+        }
+        $containerFileDoesNotExists = !file_exists(SYSTEM_PATH.'/cnt_'.CONTAINER_NAME);
+        if ($containerFileDoesNotExists) {
+            echo 'Because container file does not exists'.PHP_EOL;
+        }
+
+        return $devModeEnabledInDotEnvFile
+            || $attributeScannablePathsChanged
+            || $testsChanged
+            || $vendorChanged
+            || $appChanged
+            || $recollectAttributesInDevMode
+            || $containerFileDoesNotExists;
     }
 }
