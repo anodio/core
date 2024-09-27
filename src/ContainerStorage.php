@@ -7,11 +7,7 @@ use Swow\Coroutine;
 
 class ContainerStorage
 {
-    public static \SplFixedArray $containers;
-
-    public static int $size = 9999;
-
-    private static int $sizeLen = 4;
+    public static array $containers;
     private static Container $mainContainer;
 
     /**
@@ -19,11 +15,7 @@ class ContainerStorage
      * @return void
      */
     public static function getAdoptedCoroutineNumber(): int {
-        $coroutineId = Coroutine::getCurrent()->getId();
-        if (strlen($coroutineId)>self::$sizeLen) {
-            $coroutineId = substr($coroutineId, -self::$sizeLen);
-        }
-        return $coroutineId;
+        return Coroutine::getCurrent()->getId();
     }
 
     public static function getContainer(): Container {
@@ -59,6 +51,6 @@ class ContainerStorage
     }
 
     public static function init() {
-        self::$containers = new \SplFixedArray(self::$size);
+        self::$containers = [];
     }
 }
