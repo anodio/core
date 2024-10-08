@@ -1,5 +1,8 @@
 <?php
 
+ini_set('opcache.enable', 0);
+ini_set('opcache.enable_cli', 0);
+
 use Anodio\Core\ContainerStorage;
 use Anodio\Core\Helpers\StartHelper;
 
